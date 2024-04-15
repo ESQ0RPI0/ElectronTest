@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Electron.Api\Electron.Api.csproj" />
+    <ProjectReference Include="..\Electron.Database\Electron.Database.csproj" />
+    <ProjectReference Include="..\Electron.Domain\Electron.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
