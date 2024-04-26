@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Electron.Api.Forms;
 using Electron.Database.Context;
 using Electron.Database.Models;
 using Electron.Domain.Enums;
@@ -7,6 +6,7 @@ using Electron.Domain.Models;
 using Electron.Logic.Forms;
 using Electron.Logic.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
 
 namespace Electron.Logic
 {
@@ -21,7 +21,7 @@ namespace Electron.Logic
             _mapper = mapper;
         }
 
-        public async Task<List<PersonListModel>> GetListAsync(int count, int offset, CancellationToken token)
+        public async Task<IEnumerable<PersonListModel>> GetListAsync(int count, int offset, CancellationToken token)
         {
             var list = await _dc.Persons
                 .AsNoTracking()
@@ -40,7 +40,7 @@ namespace Electron.Logic
                 _ => throw new NotImplementedException()
             };
         }
-        public async Task<List<PersonListModel>> GetGrandGrandChildListAsync(long id, RelativeTypes type, int count, int offset, CancellationToken token)
+        public async Task<IEnumerable<PersonListModel>> GetGrandGrandChildListAsync(long id, RelativeTypes type, int count, int offset, CancellationToken token)
         {
             var people = await _dc.Persons
                 .AsNoTracking()
@@ -48,7 +48,7 @@ namespace Electron.Logic
                 .Where(u => u.GrandFatherId.HasValue && u.GrandFather.FatherId == id)
                 .ToListAsync(token);
 
-            return _mapper.Map<List<PersonListModel>>(people);
+            return _mapper.Map<ImmutableList<PersonListModel>>(people);
         }
 
         public async Task<bool> UpdatePersonAsync(UpdatePersonInfoRequest form, CancellationToken token)
@@ -61,7 +61,7 @@ namespace Electron.Logic
             PersonDbModel? entity = default;
 
             if (form.Id.HasValue)
-                entity = await _dc.Persons.FirstOrDefaultAsync(u => u.Id == form.Id.Value, token);            
+                entity = await _dc.Persons.FirstOrDefaultAsync(u => u.Id == form.Id.Value, token);
 
             if (entity is null)
                 entity = new PersonDbModel();

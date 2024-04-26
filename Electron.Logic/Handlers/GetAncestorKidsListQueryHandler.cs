@@ -2,7 +2,6 @@
 using Electron.Logic.Forms;
 using Electron.Logic.Interfaces;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Electron.Logic.Handlers
 {
