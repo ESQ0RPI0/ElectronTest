@@ -4,6 +4,7 @@ using Electron.Database.Context;
 using Electron.Database.Models;
 using Electron.Domain.Enums;
 using Electron.Domain.Models;
+using Electron.Logic.Forms;
 using Electron.Logic.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,7 +51,7 @@ namespace Electron.Logic
             return _mapper.Map<List<PersonListModel>>(people);
         }
 
-        public async Task<bool> UpdatePersonAsync(UpdatePersonForm form, CancellationToken token)
+        public async Task<bool> UpdatePersonAsync(UpdatePersonInfoRequest form, CancellationToken token)
         {
             var father = await GetFatherAsync(form, token);
 
@@ -78,7 +79,7 @@ namespace Electron.Logic
             return true;
         }
 
-        private async Task<PersonDbModel?> GetFatherAsync(UpdatePersonForm form, CancellationToken token)
+        private async Task<PersonDbModel?> GetFatherAsync(UpdatePersonInfoRequest form, CancellationToken token)
         {
             if (!form.FatherId.HasValue)
                 return null;

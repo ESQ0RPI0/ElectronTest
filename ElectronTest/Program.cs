@@ -1,7 +1,6 @@
-using Electron.Logic.Mapping;
 using Electron.Database.Extensions;
-using Electron.Logic.Interfaces;
-using Electron.Logic;
+using Electron.Logic.Mapping;
+using Electron.Logic.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +16,8 @@ builder.Services.AddAutoMapper(typeof(MainMappingProfile));
 var con = builder.Configuration.GetConnectionString("DB");
 
 builder.Services.AddPersonContext(con);
-//выноситься в отдельный метод расширения
-builder.Services.AddScoped<IPersonService, PersonService>();
+
+builder.Services.InitLogic();
 
 var app = builder.Build();
 

@@ -1,53 +1,82 @@
 using Electron.Api.Forms;
 using Electron.Domain.Enums;
 using Electron.Domain.Models;
-using Electron.Logic.Interfaces;
+using Electron.Logic.Forms;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ElectronTest.Controllers
 {
+    //кустарная валидация заменяема отдельным валидатором или FluentValidation c превалидатором от MediatR
     [ApiController]
     [Route("[controller]")]
     public class PersonController : ControllerBase
     {
-        private readonly IPersonService _personService;
+        private readonly ISender _mediator;
 
-        public PersonController(IPersonService personService)
+        public PersonController(ISender mediator)
         {
-            _personService = personService;
+            _mediator = mediator;
         }
 
         [HttpGet]
         [Route("[action]")]
         public async Task<IEnumerable<PersonListModel>> GetList([FromQuery] int count, [FromQuery] int offset, CancellationToken token)
         {
-            var result = await _personService.GetListAsync(count, offset, token);
+            var result = await _mediator.Send(new GetListRequest(count, offset), token);
 
             return result;
         }
         [HttpPost]
         [Route("[action]")]
-        public async Task<bool> UpdatePersonInfo([FromBody]UpdatePersonForm form, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdatePersonInfo([FromBody] UpdatePersonForm form, CancellationToken cancellationToken)
         {
-            return await _personService.UpdatePersonAsync(form, cancellationToken);
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if(form.FatherId.HasValue && form.Id.HasValue && (form.FatherId.Value == form.Id.Value))
+                return BadRequest("Child cannot be father to himself");
+
+            var result = await _mediator.Send(new UpdatePersonInfoRequest(form.Id, form.Name, form.LastName, form.Birthday, form.FatherId),
+                cancellationToken);
+
+            return Ok(result);
         }
         [HttpGet]
         [Route("[action]")]
-        public async Task<Person> GetGrandFatherInfo([FromQuery]long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetGrandFatherInfo([FromQuery] long id, CancellationToken cancellationToken)
         {
-            return await _personService.GetPersonAsync(id, RelativeTypes.GrandFather, cancellationToken);
+            if(id < 1)
+                return BadRequest("Id cannot be 0 or negative");
+
+            var result = await _mediator.Send(new GetGrandFatherRequest(id), cancellationToken);
+
+            return Ok(result);
         }
         [HttpGet]
         [Route("[action]")]
-        public async Task<Person> GetGrandGrandFatherInfo([FromQuery] long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetGrandGrandFatherInfo([FromQuery] long id, CancellationToken cancellationToken)
         {
-            return await _personService.GetPersonAsync(id, RelativeTypes.GrandGrandFather, cancellationToken);
+            if (id < 1)
+                return BadRequest("Id cannot be 0 or negative");
+
+            var result = await _mediator.Send(new GetGrandGrandFatherRequest(id), cancellationToken);
+
+            return Ok(result);
         }
         [HttpGet]
         [Route("[action]")]
-        public async Task<List<PersonListModel>> GetGrandGrandFatherKidsList([FromQuery] long id, [FromQuery] int offset, [FromQuery] int count, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetGrandGrandFatherKidsList([FromQuery] long id, [FromQuery] int offset, [FromQuery] int count, CancellationToken cancellationToken)
         {
-            return await _personService.GetGrandGrandChildListAsync(id, RelativeTypes.GrandGrandFather, count, offset, cancellationToken);
+            if (id < 1)
+                return BadRequest("Id cannot be 0 or negative");
+
+            if(count < 1)
+                return BadRequest("Count cannot be 0 or negative");
+
+            var result = await _mediator.Send(new GetAncestorsChildsRequest(id, RelativeTypes.GrandGrandFather, count, offset), cancellationToken);
+
+            return Ok(result);
         }
     }
 }

@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Electron.Domain", "Electron
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Electron.Logic", "Electron.Logic\Electron.Logic.csproj", "{D2476F42-FD57-4EC7-8C3C-26EC7E3CE9A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Electron.Api", "Electron.Api\Electron.Api.csproj", "{DB055B6F-E2FA-4320-B947-48E5482DDB76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Electron.Api", "Electron.Api\Electron.Api.csproj", "{DB055B6F-E2FA-4320-B947-48E5482DDB76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
